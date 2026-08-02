@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
     paths: ['ubuntu-26.04.pkrvars.hcl']
+permissions:
+  contents: read
 jobs:
   build:
     uses: ./.github/workflows/packer.yml

@@ -4,6 +4,8 @@ on:
     paths:
       - '*.pkrvars.hcl'
 
+permissions:
+  contents: read
 jobs:
   validate-iso:
     runs-on: ubuntu-latest

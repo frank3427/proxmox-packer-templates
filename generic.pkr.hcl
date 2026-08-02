@@ -133,7 +133,7 @@ build {
     for_each = length(var.provisioner) > 0 ? [1] : []
     labels = ["shell"]
     content {
-      execute_command = "echo 'packer' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+      execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
       inline          = var.provisioner
       skip_clean      = true
     }

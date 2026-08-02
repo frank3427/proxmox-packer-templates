@@ -28,6 +28,8 @@ on:
         required: true
       proxmox_password:
         required: true
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest

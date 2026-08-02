@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
     paths: ['alpine-3.22.pkrvars.hcl']
+permissions:
+  contents: read
 jobs:
   build:
     uses: ./.github/workflows/packer.yml
