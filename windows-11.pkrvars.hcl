@@ -19,7 +19,7 @@ unattended_content = {
     }
   }
   "/sysprep-unattend.xml" = {
-    template = "./http/windows/sysprep-unattend-win11.xml.pkrtpl"
+    template = "./http/windows/sysprep-unattend.xml.pkrtpl"
     vars = {
       image_name = ""
     }
@@ -39,5 +39,5 @@ cloud_init   = false
 boot_command   = []
 provisioner    = []
 provisioner_windows = [
-  "$sysprep = Get-PSDrive -PSProvider FileSystem | ForEach-Object { Join-Path $_.Root 'sysprep.ps1' } | Where-Object { Test-Path $_ } | Select-Object -First 1; powershell -NoProfile -ExecutionPolicy Bypass -File $sysprep"
+  "$s = Get-PSDrive -PSProvider FileSystem | ForEach-Object { Join-Path $_.Root 'sysprep.ps1' } | Where-Object { Test-Path $_ } | Select-Object -First 1; if (-not $s) { throw 'sysprep.ps1 not found on any attached drive' }; & $s"
 ]

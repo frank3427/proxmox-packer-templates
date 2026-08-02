@@ -144,6 +144,8 @@ build {
     labels = ["powershell"]
     content {
       inline = var.provisioner_windows
+      # The image is sealed once this returns, so leave no cleanup traces behind
+      skip_clean = true
     }
   }
 }
