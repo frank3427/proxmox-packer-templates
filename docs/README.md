@@ -4,6 +4,13 @@ This folder contains useful hints on how to provision a VM with the packer templ
 
 ## OPNSense
 
+> [!WARNING]
+> The OPNsense template deliberately boots with its packet filter **disabled**,
+> SSH enabled, and the default `root`/`opnsense` credentials, so that automation
+> can reach it. A clone is wide open until you run the provisioning playbook
+> below (or reconfigure it manually). Do not attach a clone to an untrusted
+> network before that step.
+
 ### Setup VM
 
 ```bash
@@ -41,7 +48,8 @@ Bash script
 export OPNSENSE_HOST=https://10.10.1.1 # ip of the opnsense vm
 export OPNSENSE_PASSWORD=Secret123
 ./create-opnsense-api-keys.sh -h
-./create-opnsense-api-keys.sh --delete-existing | jq .
+# pass -k/--insecure only if the firewall still has its self-signed certificate
+./create-opnsense-api-keys.sh -k --delete-existing | jq .
 {
   "result": "ok",
   "hostname": "OPNsense.internal",

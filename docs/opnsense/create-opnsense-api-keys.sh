@@ -7,11 +7,13 @@ OPNSENSE_PASSWORD="${OPNSENSE_PASSWORD:-"opnsense"}"
 FORCE_GEN=0
 DELETE_EXISTING=0
 VERBOSE=0
+CURL_INSECURE=""
 
 for arg in "$@"; do
     case $arg in
         --force)           FORCE_GEN=1 ;;
         --delete-existing) DELETE_EXISTING=1 ;;
+        -k|--insecure)     CURL_INSECURE="-k" ;;
         -v)                VERBOSE=1 ;;
     esac
 done
@@ -19,17 +21,18 @@ done
 # Temp Files
 COOKIE_JAR=$(mktemp)
 LOGIN_HTML=$(mktemp)
+LOGIN_DATA=$(mktemp)
 SEARCH_JSON=$(mktemp)
 KEYS_JSON=$(mktemp)
 
 # Security
-chmod 600 "$COOKIE_JAR" "$LOGIN_HTML" "$SEARCH_JSON" "$KEYS_JSON"
+chmod 600 "$COOKIE_JAR" "$LOGIN_HTML" "$LOGIN_DATA" "$SEARCH_JSON" "$KEYS_JSON"
 
 # Ensure cleanup on exit
-trap "rm -f $COOKIE_JAR $LOGIN_HTML $SEARCH_JSON $KEYS_JSON" EXIT
+trap "rm -f $COOKIE_JAR $LOGIN_HTML $LOGIN_DATA $SEARCH_JSON $KEYS_JSON" EXIT
 
 # Get CSRF
-curl -k -L -s -c "$COOKIE_JAR" "$OPNSENSE_HOST/" > "$LOGIN_HTML"
+curl $CURL_INSECURE -L -s -c "$COOKIE_JAR" "$OPNSENSE_HOST/" > "$LOGIN_HTML"
 
 CSRF_LINE=$(grep 'autocomplete="new-password"' "$LOGIN_HTML")
 CSRF_FIELD=$(echo "$CSRF_LINE" | sed 's/.*name="\([^"]*\)".*/\1/')
@@ -42,17 +45,17 @@ fi
 
 # cat $COOKIE_JAR
 
-# Login
-curl -k -L -s -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
-     -d "usernamefld=${OPNSENSE_USERNAME}" \
-     -d "passwordfld=${OPNSENSE_PASSWORD}" \
-     -d "login=1" \
-     -d "${CSRF_FIELD}=${CSRF_VALUE}" \
+# Login (form data via file so the password never appears in the process list)
+cat > "$LOGIN_DATA" <<EOF
+usernamefld=${OPNSENSE_USERNAME}&passwordfld=${OPNSENSE_PASSWORD}&login=1&${CSRF_FIELD}=${CSRF_VALUE}
+EOF
+curl $CURL_INSECURE -L -s -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
+     -d @"$LOGIN_DATA" \
      "$OPNSENSE_HOST/" > /dev/null
 
 
 # Check for existing key
-curl -k -s -X POST \
+curl $CURL_INSECURE -s -X POST \
      -b "$COOKIE_JAR" \
      -H "Content-Type: application/json" \
      -H "Accept: application/json" \
@@ -68,7 +71,7 @@ if [ -n "$EXISTING_KEY_IDS" ]; then
     if [ "$DELETE_EXISTING" -eq 1 ]; then
         # DELETE MODE: Loop through IDs and delete them
         for KEY_ID in $EXISTING_KEY_IDS; do
-            curl -k -s -X POST \
+            curl $CURL_INSECURE -s -X POST \
                  -b "$COOKIE_JAR" \
                  -H "Content-Type: application/json" \
                  -H "Accept: application/json" \
@@ -88,7 +91,7 @@ if [ -n "$EXISTING_KEY_IDS" ]; then
 fi
 
 # Generate new key
-RESPONSE=$(curl -k -s -X POST \
+RESPONSE=$(curl $CURL_INSECURE -s -X POST \
      -b "$COOKIE_JAR" \
      -H "Content-Type: application/json" \
      -H "Accept: application/json" \
