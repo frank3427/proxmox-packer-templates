@@ -83,6 +83,8 @@ resource "null_resource" "connection_test" {
   connection {
     type     = var.windows ? "winrm" : "ssh"
     host     = local.vm_ipv4_address[count.index]
+    port     = var.windows ? 5986 : 22
+    https    = var.windows
     user     = local.test_username
     password = local.test_password
     timeout  = var.connection_timeout
@@ -112,6 +114,8 @@ resource "null_resource" "reboot" {
   connection {
     type     = var.windows ? "winrm" : "ssh"
     host     = local.vm_ipv4_address[0]
+    port     = var.windows ? 5986 : 22
+    https    = var.windows
     user     = local.test_username
     password = local.test_password
     timeout  = var.connection_timeout
@@ -143,6 +147,8 @@ resource "null_resource" "post_reboot_test" {
   connection {
     type     = var.windows ? "winrm" : "ssh"
     host     = local.vm_ipv4_address[0]
+    port     = var.windows ? 5986 : 22
+    https    = var.windows
     user     = local.test_username
     password = local.test_password
     timeout  = var.reboot_timeout

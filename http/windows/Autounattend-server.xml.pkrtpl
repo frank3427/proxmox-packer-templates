@@ -183,6 +183,8 @@
     </settings>
     <settings pass="offlineServicing">
         <component name="Microsoft-Windows-LUA-Settings" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- UAC is off only while FirstLogonCommands need an elevated context
+                 (build and clone first boot); setup.ps1 re-enables it on clones. -->
             <EnableLUA>false</EnableLUA>
         </component>
     </settings>
