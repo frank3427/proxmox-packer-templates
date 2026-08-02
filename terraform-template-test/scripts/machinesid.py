@@ -17,9 +17,10 @@ def main():
     query = json.load(sys.stdin)
 
     session = winrm.Session(
-        "http://{}:5985/wsman".format(query["host"]),
+        "https://{}:5986/wsman".format(query["host"]),
         auth=(query["user"], query["password"]),
         transport="basic",
+        server_cert_validation="ignore",
         read_timeout_sec=60,
         operation_timeout_sec=50,
     )
