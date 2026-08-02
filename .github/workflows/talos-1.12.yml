@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
     paths: ['talos-1.12.pkrvars.hcl']
+permissions:
+  contents: read
 jobs:
   build:
     uses: ./.github/workflows/packer.yml
