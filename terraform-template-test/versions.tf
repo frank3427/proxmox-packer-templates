@@ -6,11 +6,11 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.3.0"
+      version = "3.3.1"
     }
     external = {
       source  = "hashicorp/external"
-      version = "2.4.0"
+      version = "2.4.1"
     }
   }
   required_version = ">= 1.0"
